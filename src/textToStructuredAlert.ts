@@ -20,6 +20,7 @@ const functions = {
 };
 
 const model = genAi.getGenerativeModel({
+    // model: "gemini-1.5-pro",
     model: "gemini-1.5-flash",
     // tools: [
     //     {
@@ -283,10 +284,10 @@ export async function generateGtfsRtFromUnstructuredAlertPayload(
                         ? `The alert title is ${overrideAlertTitle} and in ${unstructuredAlertContentLang} language. Do not change it in its original language. Translate it to en.`
                         : ""
                 }
-                The alert is in ${unstructuredAlertContent}, the human readable content should be generated in that language and en.
-                If there are images, consider them ONLY in ${unstructuredAlertContentLang}, do not include other translations for images if they aren't provided.
+                The alert is in "${unstructuredAlertContent}", the human readable content should be generated in that language and "en".
+                If there are images, consider them ONLY in "${unstructuredAlertContentLang}", do not include other translations for images if they aren't provided.
                 Consider ids of entities as they are in the alert.
-                The alert url is ${alertUrl} and it's in ${unstructuredAlertContentLang}, do not include other translations for urls if they aren't provided.
+                The alert url is ${alertUrl} and it's in "${unstructuredAlertContentLang}", do not include other translations for urls if they aren't provided.
                 Human readable content MUST NOT contain any structured data, only gramatically correct text, ONLY include what is RELEVANT on human readable info, SKIP formatting, headings, etc.
                 The current date is ${new Date().toISOString()},
                 Any relative or incomplete date should be considered:
