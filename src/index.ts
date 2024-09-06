@@ -58,9 +58,7 @@ server.get<{
             alertTitle
         );
 
-        reply.send({
-            generatedAlert,
-        });
+        reply.send(generatedAlert);
     } catch (e) {
         reply.code(500).send({
             error: true,
