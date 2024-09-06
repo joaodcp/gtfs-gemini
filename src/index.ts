@@ -1,12 +1,17 @@
 import fastify from "fastify";
 import * as cheerio from "cheerio";
 import { generateGtfsRtFromUnstructuredAlertPayload } from "./textToStructuredAlert";
+import {
+    carrisFetchAndParseHtml,
+    mobicascaisFetchAndParseHtml,
+} from "./agencyPayloadUtils";
 
+const PORT = Number(process.env.PORT) || 8080;
 const server = fastify();
 
 const alertUrlDomainAllowList = [
     {
-        agencyName: "mobicascais",
+        name: "mobicascais",
         allowList: [
             "mobi.cascais.pt",
             "mobicascais.pt",
@@ -15,7 +20,7 @@ const alertUrlDomainAllowList = [
         ],
     },
     {
-        agencyName: "carris",
+        name: "carris",
         allowList: ["carris.pt", "www.carris.pt"],
     },
 ];
@@ -39,81 +44,33 @@ server.get<{
         });
     }
 
-    if (agency.agencyName === "mobicascais") {
-        const htmlPayload = await fetch(alertSourceUrl).then((res) =>
-            res.text()
-        );
-
-        const $ = cheerio.load(htmlPayload);
-        const alertTitle = $(".page-title").text();
-        const slimmedPayload = `
-        ${$(".page-title").html()}\n
-        ${$('[role="article"]').html()}\n
-        `;
-
-        if (!slimmedPayload) {
-            return reply.code(404).send({
-                error: true,
-                message: "No alert content found.",
-            });
-        }
+    try {
+        const { alertTitle, slimmedPayload } =
+            agency.name == "mobicascais"
+                ? await mobicascaisFetchAndParseHtml(alertSourceUrl)
+                : await carrisFetchAndParseHtml(alertSourceUrl);
 
         const generatedAlert = await generateGtfsRtFromUnstructuredAlertPayload(
             slimmedPayload,
             "pt",
             alertSourceUrl,
-            agency.agencyName,
+            agency.name,
             alertTitle
         );
 
-        return reply.send({
-            generated: generatedAlert,
+        reply.send({
+            generatedAlert,
         });
-    }
-
-    if (agency.agencyName == "carris") {
-        const htmlPayload = await fetch(alertSourceUrl).then((res) =>
-            res.text()
-        );
-
-        const $ = cheerio.load(htmlPayload);
-
-        const alertTitle = $("#page-title").text();
-        console.log("ALWERTITLTE", alertTitle);
-        const slimmedPayload = $("#content").html()?.trim();
-
-        if (!slimmedPayload) {
-            return reply.code(404).send({
-                error: true,
-                message: "No alert content found.",
-            });
-        }
-
-        try {
-            const generatedAlert =
-                await generateGtfsRtFromUnstructuredAlertPayload(
-                    slimmedPayload,
-                    "pt",
-                    alertSourceUrl,
-                    agency.agencyName,
-                    alertTitle
-                );
-
-            return reply.send({
-                success: true,
-                generated: generatedAlert,
-            });
-        } catch (e) {
-            return reply.code(500).send({
-                error: true,
-                message: "Error generating alert.",
-                exception: e,
-            });
-        }
+    } catch (e) {
+        reply.code(500).send({
+            error: true,
+            message: "Error generating alert.",
+            exception: e,
+        });
     }
 });
 
-server.listen({ port: 8080 }, (err, address) => {
+server.listen({ port: PORT }, (err, address) => {
     if (err) {
         console.error(err);
         process.exit(1);
