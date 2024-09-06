@@ -15,3 +15,5 @@ Issues that have been popping up:
 -   Including markup/formatted markdown in human readable fields (description_text, mostly). The idea is for thos fields to be composed only of gramtically correct, unformatted prose.
 -   Translations not matching the language
 -   Original text not being kept as-is: the idea is to keep as much of the alert as it was published by the agency. This loves to paraphrase and change text to something worded differently. header_text is right now programatically kept as-is, and the Gemini output is only consiudered for translations to languages other than the original one.
+
+Next step would be to keep a list of each agencies routes and stops to allow for the model to attempt at outputting entity ids that mathc the ones in the static GTFS. Maybe using context caching to avoid sending all that data on every content generation.
