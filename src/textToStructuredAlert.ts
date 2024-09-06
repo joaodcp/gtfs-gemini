@@ -314,7 +314,7 @@ export async function generateGtfsRtFromUnstructuredAlertPayload(
     if (overrideAlertTitle) {
         jsonResult.alert.header_text.translation.find(
             (t) => t.language === unstructuredAlertContentLang
-        )!.text = overrideAlertTitle + "mlem";
+        )!.text = overrideAlertTitle;
     }
 
     jsonResult.alert.informed_entity.forEach((entity: EntitySelector) => {
