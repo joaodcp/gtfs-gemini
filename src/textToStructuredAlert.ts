@@ -284,7 +284,7 @@ export async function generateGtfsRtFromUnstructuredAlertPayload(
                         ? `The alert title is ${overrideAlertTitle} and in ${unstructuredAlertContentLang} language. Do not change it in its original language. Translate it to en.`
                         : ""
                 }
-                The alert is in "${unstructuredAlertContent}", the human readable content should be generated in that language and "en".
+                The alert is in "${unstructuredAlertContentLang}", the human readable content should be generated in that language and "en".
                 If there are images, consider them ONLY in "${unstructuredAlertContentLang}", do not include other translations for images if they aren't provided.
                 Consider ids of entities as they are in the alert.
                 The alert url is ${alertUrl} and it's in "${unstructuredAlertContentLang}", do not include other translations for urls if they aren't provided.
